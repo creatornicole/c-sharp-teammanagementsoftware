@@ -7,4 +7,14 @@
     <UseWPF>true</UseWPF>
   </PropertyGroup>
 
+  <ItemGroup>
+    <None Remove="Images\TMM_Electric_Original.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Images\TMM_Electric_Original.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+  </ItemGroup>
+
 </Project>
