@@ -83,11 +83,9 @@ namespace TMMTMS
             return false;
         }
 
-        public static string[] GetTeammemberNames()
+        public static List<string> GetTeammemberNames()
         {
-            string[] teammembernames;
-            int totalTeammembers = CountEntriesInTable("teammitglied");
-            teammembernames = new string[totalTeammembers];
+            List<string> teammembernames = new List<string>();
 
             try
             {
@@ -97,22 +95,17 @@ namespace TMMTMS
 
                     string query = "SELECT nachname, vorname FROM teammitglied";
 
-                    if(totalTeammembers > 0)
+                    using (SqlCommand command = new SqlCommand(query, connection))
                     {
-                        using (SqlCommand command = new SqlCommand(query, connection))
+                        using (SqlDataReader reader = command.ExecuteReader())
                         {
-                            using (SqlDataReader reader = command.ExecuteReader())
+                            while(reader.Read())
                             {
-                                int i = 0;
-                                while(reader.Read())
-                                {
-                                    string firstName = reader["vorname"].ToString();
-                                    string lastName = reader["nachname"].ToString();
-                                    string completeName = lastName + ", " + firstName;
+                                string firstName = reader["vorname"].ToString();
+                                string lastName = reader["nachname"].ToString();
+                                string completeName = lastName + ", " + firstName;
 
-                                    teammembernames[i] = completeName;
-                                    i++;
-                                }
+                                teammembernames.Add(completeName);
                             }
                         }
                     }
@@ -129,38 +122,6 @@ namespace TMMTMS
             }
 
             return teammembernames;
-        }
-
-        private static int CountEntriesInTable(string table)
-        {
-            int countResult = -1;
-            try
-            {
-                using (SqlConnection connection = new SqlConnection(GetConnectionString()))
-                {
-                    OpenConnection(connection);
-
-                    string countQuery = "SELECT COUNT(*) FROM " + table;
-
-                    using (SqlCommand command = new SqlCommand(countQuery, connection))
-                    {
-                        object countResultObject = command.ExecuteScalar();
-                        countResult = Convert.ToInt32(countResultObject);
-                    }
-
-                    CloseConnection(connection);
-                }
-            }
-            catch (SqlException ex)
-            {
-                Console.WriteLine("SQL Exception: " + ex.Message);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Exception:  " + ex.Message);
-            }
-
-            return countResult;
         }
 
         private static void CloseConnection(SqlConnection connection)

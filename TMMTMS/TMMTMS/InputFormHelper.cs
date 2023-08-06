@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Controls;
 
 namespace TMMTMS
 {
@@ -28,6 +29,19 @@ namespace TMMTMS
             }
 
             return comboBoxValue;
+        }
+
+        public static List<string> GetSelectedListBoxItemsAsStrings(ListBox listBox)
+        {
+            List<string> selectedListBoxItems = new List<string>();
+            foreach(Object selectedItem in listBox.SelectedItems)
+            {
+                if(selectedItem is ListBoxItem listBoxItem)
+                {
+                    selectedListBoxItems.Add(listBoxItem.Content.ToString());
+                }
+            }
+            return selectedListBoxItems;
         }
     }
 }

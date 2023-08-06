@@ -31,8 +31,6 @@ namespace TMMTMS
         /// Enables Drag Move with Left Mouse Down
         /// 
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
         private void Border_MouseDown(object sender, MouseButtonEventArgs e)
         {
             if (e.ChangedButton == MouseButton.Left)
@@ -48,8 +46,6 @@ namespace TMMTMS
         /// Maximize/Normalize on Double Left Click
         /// 
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
         private void Border_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             if (e.ClickCount == 2)
