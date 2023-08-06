@@ -14,6 +14,7 @@ namespace TMMTMS
         public MainWindow()
         {
             InitializeComponent();
+
         }
 
         /// <summary>
@@ -59,6 +60,12 @@ namespace TMMTMS
                     IsMaximized = true;
                 }
             }
+        }
+
+        private void Button_SwitchToAddPage(object sender, EventArgs e)
+        {
+            Window1 win = new Window1();
+            win.Show();
         }
     }
 }
