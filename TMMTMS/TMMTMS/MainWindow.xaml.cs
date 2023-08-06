@@ -66,6 +66,16 @@ namespace TMMTMS
         {
             Window1 win = new Window1();
             win.Show();
+            this.Close();
         }
+
+        private void Button_SwitchToProtocolPage(object sender, EventArgs e)
+        {
+            ProtocolWindow protocolWindow = new ProtocolWindow();
+            protocolWindow.Show();
+            this.Close();
+        }
+
+        
     }
 }

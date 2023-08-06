@@ -10,11 +10,11 @@ none
 false
 TRACE;DEBUG;NET;NET6_0;NETCOREAPP
 D:\Stuff\Studium\HSMW\IF21wS1-B\4_c#\pruefungsbeleg\TMMTMS\TMMTMS\App.xaml
-21940794329
+31107161484
 
-11-304735804
+12-90980184
 204732605332
-MainWindow.xaml;Window1.xaml;
+MainWindow.xaml;ProtocolWindow.xaml;Window1.xaml;
 
-False
+True
 

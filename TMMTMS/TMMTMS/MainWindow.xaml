@@ -53,7 +53,7 @@
                                     <TextBlock Text="Anwesenheitsliste"/>
                                 </StackPanel>
                             </Button>
-                            <Button Style="{StaticResource menuButton}">
+                            <Button Click="Button_SwitchToProtocolPage" Style="{StaticResource menuButton}">
                                 <StackPanel Orientation="Horizontal">
                                     <!-- TODO: Add Icon -->
                                     <TextBlock Text="Protokoll"/>
