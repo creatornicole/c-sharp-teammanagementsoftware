@@ -73,87 +73,40 @@ namespace TMMTMS
 
         private void Button_AddMember(object sender, EventArgs e)
         {
-            bool inputsAreValid = ReadInputs();
-            if(!inputsAreValid)
+            if(AreInputsValid())
             {
-                ShowFailurePopUp("Eingabe(n) fehlerhaft oder unvollständig.");
-            } 
-            else
-            {
+                ReadInputs();
                 Teammitglied teammitglied = CreateMember();
                 bool insertionIsSuccess = teammitglied.StoreMember(teammitglied);
 
                 if (insertionIsSuccess)
                 {
                     ClearInputs();
-                    ShowSuccessPopUp("Teammitglied wurde erfolgreich in die Datenbank getragen.");
+                    MessageBoxHelper.ShowSuccessPopUp("Teammitglied wurde erfolgreich in die Datenbank getragen.");
                 }
                 else
                 {
-                    ShowFailurePopUp("Teammitglied konnte nicht in der Datenbank gespeichert werden.");
-                }
+                    MessageBoxHelper.ShowFailurePopUp("Teammitglied konnte nicht in der Datenbank gespeichert werden.");
+                }                
+            } 
+            else
+            {
+                MessageBoxHelper.ShowFailurePopUp("Eingabe(n) fehlerhaft oder unvollständig.");
             }
         }
 
-        //TODO: ReadInputs return false if no input!
-
-        private bool ReadInputs()
+        private void ReadInputs()
         {
-            string vornameInput = txtbox_vorname.Text;
-            string nachnameInput = txtbox_nachname.Text;
-            string handynummerInput = txtbox_handynummer.Text;
-            string seminargruppeInput = txtbox_seminargruppe.Text;
-            string hskuerzelInput = txtbox_hskuerzel.Text;
-            DateTime geburtstagInput = datepicker_geburtstag.SelectedDate.Value;
-            DateTime eintrittsdatumInput = datepicker_eintrittsdatum.SelectedDate.Value;
-            Object abteilungSelectedItem = combobox_abteilung.SelectedItem;
-            Object bereichSelectedItem = combobox_bereich.SelectedItem;
-            Object rangSelectedItem = combobox_rang.SelectedItem;
-
-            //Max-Length because of Database Restrictions (see database implementation)
-            if (ValidationHelper.IsStringValid(vornameInput, 25) && ValidationHelper.IsStringValid(nachnameInput, 25)
-                && ValidationHelper.IsStringValid(handynummerInput, 25) && ValidationHelper.IsStringValid(seminargruppeInput, 9)
-                && ValidationHelper.IsStringValid(hskuerzelInput, 8) && ValidationHelper.IsDateValid(geburtstagInput)
-                && ValidationHelper.IsDateValid(eintrittsdatumInput) && ValidationHelper.IsComboBoxSelectedItemValid(abteilungSelectedItem)
-                && ValidationHelper.IsComboBoxSelectedItemValid(bereichSelectedItem) && ValidationHelper.IsComboBoxSelectedItemValid(rangSelectedItem))
-            {
-                this.textboxValueVorname = vornameInput;
-                this.textboxValueNachname = nachnameInput;
-                this.textboxValueHandynummer = handynummerInput;
-                this.textboxValueSeminargruppe = seminargruppeInput;
-                this.textboxValueHskuerzel = hskuerzelInput;
-                this.datepickerValueGeburtstag = geburtstagInput;
-                this.datepickerValueEintrittsdatum = eintrittsdatumInput;
-                this.comboboxValueAbteilung = GetValueFromComboBox(abteilungSelectedItem);
-                this.comboboxValueBereich = GetValueFromComboBox(bereichSelectedItem);
-                this.comboboxValuePosition = GetValueFromComboBox(rangSelectedItem);
-
-                return true; 
-            }
-
-            return false;
-        }
-
-        /// <summary>
-        /// 
-        /// vorgefertigte Methoden um Value aus ComboBox zu erhalten haben nicht funktioniert - not defined
-        /// 
-        /// </summary>
-        /// <param name="selectedItem"></param>
-        /// <returns></returns>
-        private string GetValueFromComboBox(Object selectedItem)
-        {
-            string comboBoxValue = "";
-
-            if (selectedItem != null)
-            {
-                string selectedItemAsString = Convert.ToString(selectedItem);
-                int trimIndex = selectedItemAsString.IndexOf(' ');
-
-                comboBoxValue = selectedItemAsString.Substring(trimIndex + 1);
-            }
-            
-            return comboBoxValue;
+            this.textboxValueVorname = txtbox_vorname.Text;
+            this.textboxValueNachname = txtbox_nachname.Text;
+            this.textboxValueHandynummer = txtbox_handynummer.Text;
+            this.textboxValueSeminargruppe = txtbox_seminargruppe.Text;
+            this.textboxValueHskuerzel = txtbox_hskuerzel.Text;
+            this.datepickerValueGeburtstag = datepicker_geburtstag.SelectedDate.Value;
+            this.datepickerValueEintrittsdatum = datepicker_eintrittsdatum.SelectedDate.Value;
+            this.comboboxValueAbteilung = InputFormHelper.GetValueFromComboBox(combobox_abteilung.SelectedItem);
+            this.comboboxValueBereich = InputFormHelper.GetValueFromComboBox(combobox_bereich.SelectedItem);
+            this.comboboxValuePosition = InputFormHelper.GetValueFromComboBox(combobox_rang.SelectedItem);
         }
 
         private void ClearInputs()
@@ -176,17 +129,33 @@ namespace TMMTMS
                 comboboxValuePosition, comboboxValueAbteilung, comboboxValueBereich, textboxValueSeminargruppe,
                 textboxValueHskuerzel, datepickerValueGeburtstag, datepickerValueEintrittsdatum);
         }
-
-        private void ShowSuccessPopUp(string message)
-        {
-            MessageBox.Show(message, "Erfolgreich", MessageBoxButton.OK, MessageBoxImage.Information);
-        }
-
-        private void ShowFailurePopUp(string message)
-        {
-            MessageBox.Show(message, "Fehler", MessageBoxButton.OK, MessageBoxImage.Error);
-        }
-
         
+        private bool AreInputsValid()
+        {
+            string vornameInput = txtbox_vorname.Text;
+            string nachnameInput = txtbox_nachname.Text;
+            string handynummerInput = txtbox_handynummer.Text;
+            string seminargruppeInput = txtbox_seminargruppe.Text;
+            string hskuerzelInput = txtbox_hskuerzel.Text;
+            DateTime geburtstagInput = datepicker_geburtstag.SelectedDate.Value;
+            DateTime eintrittsdatumInput = datepicker_eintrittsdatum.SelectedDate.Value;
+            Object abteilungSelectedItem = combobox_abteilung.SelectedItem;
+            Object bereichSelectedItem = combobox_bereich.SelectedItem;
+            Object rangSelectedItem = combobox_rang.SelectedItem;
+
+            //Max-Length because of Database Restrictions (see database implementation)
+            if (ValidationHelper.IsStringValid(vornameInput, 25) && ValidationHelper.IsStringValid(nachnameInput, 25)
+                && ValidationHelper.IsStringValid(handynummerInput, 25) && ValidationHelper.IsStringValid(seminargruppeInput, 9)
+                && ValidationHelper.IsStringValid(hskuerzelInput, 8) && ValidationHelper.IsDateValid(geburtstagInput)
+                && ValidationHelper.IsDateValid(eintrittsdatumInput) && ValidationHelper.IsComboBoxSelectedItemValid(abteilungSelectedItem)
+                && ValidationHelper.IsComboBoxSelectedItemValid(bereichSelectedItem) && ValidationHelper.IsComboBoxSelectedItemValid(rangSelectedItem))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
     }
 }
