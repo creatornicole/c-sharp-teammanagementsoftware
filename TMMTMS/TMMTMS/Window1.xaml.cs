@@ -100,9 +100,9 @@ namespace TMMTMS
             this.textboxValueHskuerzel = txtbox_hskuerzel.Text;
             this.datepickerValueGeburtstag = datepicker_geburtstag.SelectedDate.Value;
             this.datepickerValueEintrittsdatum = datepicker_eintrittsdatum.SelectedDate.Value;
-            this.comboboxValueAbteilung = InputFormHelper.GetValueFromComboBox(combobox_abteilung.SelectedItem);
-            this.comboboxValueBereich = InputFormHelper.GetValueFromComboBox(combobox_bereich.SelectedItem);
-            this.comboboxValuePosition = InputFormHelper.GetValueFromComboBox(combobox_rang.SelectedItem);
+            this.comboboxValueAbteilung = InputFormHelper.GetValueFromComboBoxItem(combobox_abteilung.SelectedItem);
+            this.comboboxValueBereich = InputFormHelper.GetValueFromComboBoxItem(combobox_bereich.SelectedItem);
+            this.comboboxValuePosition = InputFormHelper.GetValueFromComboBoxItem(combobox_rang.SelectedItem);
         }
 
         private void ClearInputs()
@@ -121,9 +121,9 @@ namespace TMMTMS
 
         private Teammitglied CreateMember()
         {
-            return new Teammitglied(textboxValueVorname, textboxValueNachname, textboxValueHandynummer,
-                comboboxValuePosition, comboboxValueAbteilung, comboboxValueBereich, textboxValueSeminargruppe,
-                textboxValueHskuerzel, datepickerValueGeburtstag, datepickerValueEintrittsdatum);
+            return new Teammitglied(this.textboxValueVorname, this.textboxValueNachname, this.textboxValueHandynummer,
+                this.comboboxValuePosition, this.comboboxValueAbteilung, this.comboboxValueBereich, this.textboxValueSeminargruppe,
+                this.textboxValueHskuerzel, this.datepickerValueGeburtstag, this.datepickerValueEintrittsdatum);
         }
         
         private bool AreInputsValid()

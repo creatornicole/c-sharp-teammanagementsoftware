@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Windows.Documents;
 
 namespace TMMTMS
 {
@@ -32,9 +34,7 @@ namespace TMMTMS
 
         public bool StoreMember(Teammitglied teammitglied) 
         {
-            return Datenbank.InsertTeammemberData(Vorname, Nachname, Handynummer, Position, Abteilung, Bereich, 
-                Seminargruppe, Hskuerzel, Geburtstag, Eintrittsdatum);
-
+            return Datenbank.InsertTeammemberData(teammitglied);
         }
 
         public string Vorname
@@ -180,7 +180,6 @@ namespace TMMTMS
             get { return geburtstag; }
             set
             {
-                /* <= 8 because of database column geburtstag(date, null) */
                 if (value <= DateTime.Now)
                 {
                     geburtstag = value;
@@ -197,7 +196,6 @@ namespace TMMTMS
             get { return eintrittsdatum; }
             set
             {
-                /* <= 8 because of database column geburtstag(date, null) */
                 if (value <= DateTime.Now)
                 {
                     eintrittsdatum = value;

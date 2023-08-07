@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -18,7 +19,9 @@ namespace TMMTMS
     public partial class ProtocolWindow : Window
     {
         private string textboxValueBezeichnung;
-        private DateTime textboxValueDatum;
+        private string textboxValueLocation;
+        private DateTime datepickerValueDate;
+        private string comboboxValueTime;
         private List<string> selectedPresentMembers;
         private List<string> selectedAbsentMembers;
         private string textboxValueProtokollthema;
@@ -98,6 +101,20 @@ namespace TMMTMS
         private void Button_AddProtocol(object sender, EventArgs e)
         {
             ReadProtocolInputData();
+            Meeting meeting = CreateMeeting();
+            Protocol protocol = CreateProtocol(meeting);
+            ProtocolTopic protocolTopic = CreateProtocolTopic(protocol);
+
+            if(Datenbank.StoreProtocol(meeting, protocol, protocolTopic))
+            {
+                //clear inputs
+                MessageBoxHelper.ShowSuccessPopUp("Protokoll wurde erfolgreich in die Datenbank getragen.");
+            }
+            else
+            {
+                MessageBoxHelper.ShowFailurePopUp("Teammitglied konnte nicht in der Datenbank gespeichert werden.");
+            }
+            
             //save data to database
 
             //Ask for Export to Word-Doc (und Pdf?)
@@ -107,7 +124,9 @@ namespace TMMTMS
         private void ReadProtocolInputData()
         {
             this.textboxValueBezeichnung = txtbox_eventbezeichnung.Text;
-            this.textboxValueDatum = datepicker_eventdatum.SelectedDate.Value;
+            this.textboxValueLocation = txtbox_location.Text;
+            this.datepickerValueDate = datepicker_eventdatum.SelectedDate.Value;
+            this.comboboxValueTime = InputFormHelper.GetValueFromComboBoxItem(combobox_time.SelectedItem);
             this.selectedPresentMembers = InputFormHelper.GetSelectedListBoxItemsAsStrings(listBoxPresentMembers);
             this.selectedAbsentMembers = InputFormHelper.GetSelectedListBoxItemsAsStrings(listBoxAbsentMembers); ;
             this.textboxValueProtokollthema = txtbox_protokollthema1.Text;
@@ -115,7 +134,6 @@ namespace TMMTMS
             this.textboxValueProtokollthemaStichpunkt2 = txtbox_protokollthema1_stichpunkt2.Text;
             this.textboxValueProtokollthemaStichpunkt3 = txtbox_protokollthema1_stichpunkt3.Text;
     }
-
         private void InitializeObservableListBoxes()
         {
             //OberservableCollection for ListBox Collection to Add Items from Database
@@ -128,6 +146,27 @@ namespace TMMTMS
 
             AddMembersToListBox(presentMemberCollection);
             AddMembersToListBox(absentMemberCollection);
+        }
+        private Meeting CreateMeeting()
+        {
+            TimeOnly meetingTime = InputFormHelper.GetTimeOnlyFromString(this.comboboxValueTime);
+            return new Meeting(this.textboxValueBezeichnung, this.datepickerValueDate, meetingTime, this.textboxValueLocation);
+        }
+        private Protocol CreateProtocol(Meeting meeting)
+        {
+            DateTime currentDate = DateTime.Now;
+            return new Protocol(meeting, meeting.Date, currentDate);
+        }
+
+        private ProtocolTopic CreateProtocolTopic(Protocol protocol)
+        {
+            List<string> content = new List<string>
+            {
+                this.textboxValueProtokollthemaStichpunkt1,
+                this.textboxValueProtokollthemaStichpunkt2,
+                this.textboxValueProtokollthemaStichpunkt3
+            };
+            return new ProtocolTopic(protocol, this.textboxValueProtokollthema, content);
         }
     }
 }
