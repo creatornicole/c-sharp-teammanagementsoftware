@@ -190,6 +190,58 @@ namespace TMMTMS
             return hskuerzel;
         }
 
+        public static List<string> GetAttendanceDataOfTeammember(string hskuerzel)
+        {
+            List<string> attendanceStates = new List<string>();
+
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(GetConnectionString()))
+                {
+                    OpenConnection(connection);
+
+                    string query = "SELECT anwesenheitsstatus FROM teammitglied "
+                        + "CROSS JOIN meeting "
+                        + "LEFT JOIN anwesenheit ON teammitglied.hs_kuerzel = anwesenheit.hs_kuerzel "
+                        + "AND meeting.meeting_id = anwesenheit.meeting_id "
+                        + "WHERE teammitglied.hs_kuerzel = @hskuerzel";
+
+                    using (SqlCommand command = new SqlCommand(query, connection))
+                    {
+                        command.Parameters.AddWithValue("@hskuerzel", hskuerzel);
+
+                        using (SqlDataReader reader = command.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                if(!reader.IsDBNull(reader.GetOrdinal("anwesenheitsstatus")))
+                                {
+                                    int attendanceState = reader.GetInt32(reader.GetOrdinal("anwesenheitsstatus"));
+                                    string attendanceStateAsString = attendanceState.ToString();
+                                    attendanceStates.Add(attendanceStateAsString);
+                                } 
+                                else
+                                {
+                                    attendanceStates.Add("NULL");
+                                }                                
+                            }
+                        }
+                    }
+                }                
+                //connection is automatically closed at the end of this block
+            }
+            catch (SqlException ex)
+            {
+                Console.WriteLine("SQL Exception: " + ex.Message);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Exception:  " + ex.Message);
+            }
+
+            return attendanceStates;
+        }
+
         public static List<string> GetHsKuerzelFromTeammemberNames(List<string> teammembernames)
         {
             List<string> hskuerzelList = new List<string>();
@@ -200,6 +252,45 @@ namespace TMMTMS
                 hskuerzelList.Add(hskuerzel);
             }
             return hskuerzelList;
+        }
+
+        public static List<string> GetMeetingNames()
+        {
+            List<string> columnNames = new List<string>();
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(Datenbank.GetConnectionString()))
+                {
+                    Datenbank.OpenConnection(connection);
+
+                    string query = "SELECT bezeichnung, datum FROM meeting";
+
+                    using (SqlCommand command = new SqlCommand(query, connection))
+                    {
+                        using (SqlDataReader reader = command.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                string name = reader["bezeichnung"].ToString();
+                                string date = reader["datum"].ToString();
+                                string columnName = name + "\n " + date;
+
+                                columnNames.Add(columnName);
+                            }
+                        }
+                    }
+                }
+                //connection is automatically closed at the end of this block
+            }
+            catch (SqlException ex)
+            {
+                Console.WriteLine("SQL Exception: " + ex.Message);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Exception:  " + ex.Message);
+            }
+            return columnNames;
         }
 
         private static bool InsertMeetingData(Meeting meeting)

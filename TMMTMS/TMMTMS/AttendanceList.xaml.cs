@@ -51,60 +51,8 @@ namespace TMMTMS
 
         private void LoadDataGrid()
         {
-            AddColumnsDynamically();
             AddMembersToDataGrid();
-            AddAttendanceStatus();
-            
-            
-        }
-
-        private void AddColumnsDynamically()
-        {
-            //retrieve column names from database
-            List<string> columnNames = new List<string>();
-            try
-            {
-                using (SqlConnection connection = new SqlConnection(Datenbank.GetConnectionString()))
-                {
-                    Datenbank.OpenConnection(connection);
-
-                    string query = "SELECT bezeichnung, datum FROM meeting";
-
-                    using (SqlCommand command = new SqlCommand(query, connection))
-                    {
-                        using (SqlDataReader reader = command.ExecuteReader())
-                        {
-                            while (reader.Read())
-                            {
-                                string name = reader["bezeichnung"].ToString();
-                                string date = reader["datum"].ToString();
-                                string columnName = name + "\n " + date;
-
-                                columnNames.Add(columnName);
-                            }
-                        }
-
-                    }
-                }
-                //connection is automatically closed at the end of this block
-            }
-            catch (SqlException ex)
-            {
-                Console.WriteLine("SQL Exception: " + ex.Message);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Exception:  " + ex.Message);
-            }
-
-            //dynamically create DataGrid columns
-            foreach (string columnName in columnNames)
-            {
-                DataGridTextColumn column = new DataGridTextColumn();
-                column.Header = columnName;
-                column.Binding = new Binding(columnName);
-                datagrid_attendance.Columns.Add(column);
-            }
+            AddDynamicColumnHeaders();
         }
 
         private void AddMembersToDataGrid()
@@ -113,9 +61,35 @@ namespace TMMTMS
             datagrid_attendance.ItemsSource = teammemberNames;
         }
 
+        private void AddDynamicColumnHeaders()
+        {
+            List<string> columnHeaderNames = Datenbank.GetMeetingNames();
+            foreach (string columnName in columnHeaderNames)
+            {
+                DataGridTextColumn column = new DataGridTextColumn();
+                column.Header = columnName;
+                column.Binding = new Binding(columnName);
+                datagrid_attendance.Columns.Add(column);
+            }
+        }
+
+        /*
         private void AddAttendanceStatus()
         {
-            
+            List<string> hskuerzelList = Datenbank.GetHsKuerzel();
+            foreach(string hskuerzel in hskuerzelList)
+            {
+                List<int> attendanceStates = Datenbank.GetAttendanceOfHsKuerzel(hskuerzel);
+                List<string> attendanceStatesAsString = new List<string>();
+                foreach(int state in  attendanceStates)
+                {
+                    string stateAsString = Convert.ToString(state);
+                    attendanceStatesAsString.Add(stateAsString);
+                }
+                string statesAsOneString = OperationHelper.GetListStringAsOneString(attendanceStatesAsString);
+                MessageBoxHelper.ShowSuccessPopUp(hskuerzel + " " + statesAsOneString);
+            }
         }
+        */
     }
 }
