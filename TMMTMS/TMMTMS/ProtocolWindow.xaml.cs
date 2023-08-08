@@ -52,33 +52,6 @@ namespace TMMTMS
 
         }
 
-        private bool IsMaximized = false;
-        /// <summary>
-        /// 
-        /// Maximize/Normalize on Double Left Click
-        /// 
-        /// </summary>
-        private void Border_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            if (e.ClickCount == 2)
-            {
-                if (IsMaximized)
-                {
-                    this.WindowState = WindowState.Normal;
-                    this.Height = 720;
-                    this.Width = 1080;
-
-                    IsMaximized = false;
-                }
-                else
-                {
-                    this.WindowState = WindowState.Maximized;
-
-                    IsMaximized = true;
-                }
-            }
-        }
-
         private void AddMembersToListBox(ObservableCollection<string> collection)
         {
             List<string> members = Datenbank.GetTeammemberNames();
@@ -104,18 +77,16 @@ namespace TMMTMS
             Meeting meeting = CreateMeeting();
             Protocol protocol = CreateProtocol(meeting);
             ProtocolTopic protocolTopic = CreateProtocolTopic(protocol);
-
-            if(Datenbank.StoreProtocol(meeting, protocol, protocolTopic))
+            
+            if (Datenbank.StoreProtocol(meeting, protocol, protocolTopic))
             {
-                //clear inputs
-                MessageBoxHelper.ShowSuccessPopUp("Protokoll wurde erfolgreich in die Datenbank getragen.");
+                ClearInputs();
+                MessageBoxHelper.ShowSuccessPopUp("Protokolldaten wurden erfolgreich in die Datenbank getragen.");
             }
             else
             {
                 MessageBoxHelper.ShowFailurePopUp("Teammitglied konnte nicht in der Datenbank gespeichert werden.");
             }
-            
-            //save data to database
 
             //Ask for Export to Word-Doc (und Pdf?)
 
@@ -133,7 +104,22 @@ namespace TMMTMS
             this.textboxValueProtokollthemaStichpunkt1 = txtbox_protokollthema1_stichpunkt1.Text;
             this.textboxValueProtokollthemaStichpunkt2 = txtbox_protokollthema1_stichpunkt2.Text;
             this.textboxValueProtokollthemaStichpunkt3 = txtbox_protokollthema1_stichpunkt3.Text;
-    }
+        }
+
+        private void ClearInputs()
+        {
+            txtbox_eventbezeichnung.Clear();
+            txtbox_location.Clear();
+            txtbox_protokollthema1.Clear();
+            txtbox_protokollthema1_stichpunkt1.Clear();
+            txtbox_protokollthema1_stichpunkt2.Clear();
+            txtbox_protokollthema1_stichpunkt3.Clear();
+            datepicker_eventdatum.SelectedDate = DateTime.Now;
+            combobox_time.SelectedIndex = -1;
+            listBoxPresentMembers.SelectedIndex = -1;
+            listBoxAbsentMembers.SelectedIndex = -1;          
+        }
+
         private void InitializeObservableListBoxes()
         {
             //OberservableCollection for ListBox Collection to Add Items from Database
@@ -147,11 +133,17 @@ namespace TMMTMS
             AddMembersToListBox(presentMemberCollection);
             AddMembersToListBox(absentMemberCollection);
         }
+
         private Meeting CreateMeeting()
         {
             TimeOnly meetingTime = InputFormHelper.GetTimeOnlyFromString(this.comboboxValueTime);
-            return new Meeting(this.textboxValueBezeichnung, this.datepickerValueDate, meetingTime, this.textboxValueLocation);
+            List<string> presentMembersHsKuerzel = Datenbank.GetHsKuerzelFromTeammemberNames(this.selectedPresentMembers);
+            List<string> absentMembersHsKuerzel = Datenbank.GetHsKuerzelFromTeammemberNames(this.selectedAbsentMembers);
+
+            return new Meeting(this.textboxValueBezeichnung, this.datepickerValueDate, meetingTime, this.textboxValueLocation,
+                presentMembersHsKuerzel, absentMembersHsKuerzel);
         }
+
         private Protocol CreateProtocol(Meeting meeting)
         {
             DateTime currentDate = DateTime.Now;

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -12,7 +13,7 @@ namespace TMMTMS
     {
         /// <summary>
         /// 
-        /// vorgefertigte Methoden um Value aus ComboBox zu erhalten haben nicht funktioniert - not defined
+        /// Pre-defined Methods to Get Value from ComboBox did not work (Error: not defined methods)
         /// 
         /// </summary>
         public static string GetValueFromComboBoxItem(Object selectedItem)
@@ -32,15 +33,14 @@ namespace TMMTMS
 
         public static List<string> GetSelectedListBoxItemsAsStrings(ListBox listBox)
         {
-            List<string> selectedListBoxItems = new List<string>();
-            foreach(Object selectedItem in listBox.SelectedItems)
+            List<string> selectedListBoxItemsAsString = new List<string>();
+
+            foreach(var selectedItem in listBox.SelectedItems)
             {
-                if(selectedItem is ListBoxItem listBoxItem)
-                {
-                    selectedListBoxItems.Add(listBoxItem.Content.ToString());
-                }
+                string selectedItemAsString = selectedItem.ToString();
+                selectedListBoxItemsAsString.Add(selectedItemAsString);
             }
-            return selectedListBoxItems;
+            return selectedListBoxItemsAsString;
         }
 
         public static TimeOnly GetTimeOnlyFromString(string timeString)

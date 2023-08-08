@@ -40,33 +40,6 @@ namespace TMMTMS
 
         }
 
-        private bool IsMaximized = false;
-        /// <summary>
-        /// 
-        /// Maximize/Normalize on Double Left Click
-        /// 
-        /// </summary>
-        private void Border_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            if (e.ClickCount == 2)
-            {
-                if (IsMaximized)
-                {
-                    this.WindowState = WindowState.Normal;
-                    this.Height = 720;
-                    this.Width = 1080;
-
-                    IsMaximized = false;
-                }
-                else
-                {
-                    this.WindowState = WindowState.Maximized;
-
-                    IsMaximized = true;
-                }
-            }
-        }
-
         private void Button_AddMember(object sender, EventArgs e)
         {
             if(AreInputsValid())

@@ -14,13 +14,18 @@ namespace TMMTMS
         private DateTime date;
         private TimeOnly time;
         private string location;
+        private List<string> presentMembers;
+        private List<string> absentMembers;
 
-        public Meeting(string name, DateTime date, TimeOnly time, string location)
+        public Meeting(string name, DateTime date, TimeOnly time, string location, 
+            List<string> presentMembers, List<string> absentMembers)
         {
             Name = name;
             Date = date;
             Time = time;
             Location = location;
+            PresentMembers = presentMembers;
+            AbsentMembers = absentMembers;
         }
 
         public string Name
@@ -78,7 +83,18 @@ namespace TMMTMS
                 }
             }
         }
-
+        public List<string> PresentMembers
+        {
+            get { return presentMembers; }
+            //ensures that internal state of list cannot be modified from outside the class
+            set { presentMembers = new List<string>(value); }
+        }
+        public List<string> AbsentMembers
+        {
+            get { return absentMembers; }
+            //ensures that internal state of list cannot be modified from outside the class
+            set { absentMembers = new List<string>(value); }
+        }
 
 
     }

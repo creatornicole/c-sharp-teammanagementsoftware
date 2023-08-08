@@ -24,19 +24,6 @@ namespace TMMTMS
             }            
         }
 
-        private static string GetConnectionString()
-        {
-            SqlConnectionStringBuilder connectionStringBuilder = new SqlConnectionStringBuilder();
-            
-            connectionStringBuilder.DataSource = "LAPTOP-D537U6PD\\SQLSERVERTMMTMS";
-            connectionStringBuilder.InitialCatalog = "tmmbase";
-            connectionStringBuilder.IntegratedSecurity = true;
-
-            string connectionString = connectionStringBuilder.ConnectionString;
-
-            return connectionString;
-        }
-
         public static bool InsertTeammemberData(Teammitglied teammember)
         {
             string vorname = teammember.Vorname;
@@ -93,6 +80,23 @@ namespace TMMTMS
             return false;
         }
 
+        public static bool StoreProtocol(Meeting meeting, Protocol protocol, ProtocolTopic topic)
+        {
+            List<string> presentMembers = meeting.PresentMembers;
+            List<string> absentMembers = meeting.AbsentMembers;
+
+            if(InsertMeetingData(meeting) && InsertProtocolData(protocol, GetLastInsertedMeetingId())
+                && InsertProtocolTopicData(topic, GetLastInsertedProtocolId()) 
+                && InsertAttendanceData(presentMembers, absentMembers))
+            {
+                return true;
+            } 
+            else
+            {
+                return false;
+            }
+        }
+        
         public static List<string> GetTeammemberNames()
         {
             List<string> teammembernames = new List<string>();
@@ -109,7 +113,7 @@ namespace TMMTMS
                     {
                         using (SqlDataReader reader = command.ExecuteReader())
                         {
-                            while(reader.Read())
+                            while (reader.Read())
                             {
                                 string firstName = reader["vorname"].ToString();
                                 string lastName = reader["nachname"].ToString();
@@ -135,17 +139,61 @@ namespace TMMTMS
             return teammembernames;
         }
 
-        public static bool StoreProtocol(Meeting meeting, Protocol protocol, ProtocolTopic topic)
+        public static List<string> GetHsKuerzelFromTeammemberNames(List<string> teammembernames)
         {
-            if(InsertMeetingData(meeting) && InsertProtocolData(protocol, GetLastInsertedMeetingId())
-                && InsertProtocolTopicData(topic, GetLastInsertedProtocolId()))
+            List<string> hskuerzel = new List<string>();
+            string firstName = null;
+            string lastName = null;
+
+            try
             {
-                return true;
-            } 
-            else
-            {
-                return false;
+                using (SqlConnection connection = new SqlConnection(GetConnectionString()))
+                {
+                    OpenConnection(connection);
+
+                    string query = "SELECT hs_kuerzel FROM teammitglied WHERE vorname = @vorname AND nachname = @nachname";
+
+                    using (SqlCommand command = new SqlCommand(query, connection))
+                    {
+                        foreach(string name in teammembernames)
+                        {
+                            string[] parts = name.Split(','); //name form: 'lastName, firstName'
+                            if (parts.Length == 2)
+                            {
+                                firstName = parts[1].Trim(); //remove whitespaces
+                                lastName = parts[0].Trim();
+                            }
+
+                            command.Parameters.Clear(); /* reusing SqlCommand for each iterationm therefore
+                                                            clear parameters before adding new ones */
+                            command.Parameters.AddWithValue("@vorname", firstName);
+                            command.Parameters.AddWithValue("@nachname", lastName);
+
+                            using (SqlDataReader reader = command.ExecuteReader())
+                            {
+                                if (reader.Read())
+                                {
+                                    string kuerzel = reader["hs_kuerzel"].ToString();
+                                    hskuerzel.Add(kuerzel);
+                                }
+                            }
+                            /* using statement ensures that SqlDataReader is properly disposed of when it goes out of scope
+                                that includes closing the reader */
+                        }
+                    }
+                }
+                //connection is automatically closed at the end of this block
             }
+            catch (SqlException ex)
+            {
+                Console.WriteLine("SQL Exception: " + ex.Message);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Exception:  " + ex.Message);
+            }
+
+            return hskuerzel;
         }
 
         private static bool InsertMeetingData(Meeting meeting)
@@ -272,8 +320,104 @@ namespace TMMTMS
             return false;
         }
 
-        private static bool InsertAttendanceData()
+        private static bool InsertAttendanceData(List<string> presentMembers, List<string> absentMembers)
         {
+            if(InsertPresentMembers(presentMembers, GetLastInsertedMeetingId(), AttendanceStatus.Present)
+                && InsertAbsentMembers(absentMembers, GetLastInsertedMeetingId(), AttendanceStatus.Absent))
+            {
+                return true;
+            } 
+            else
+            {
+                return false;
+            }            
+        }
+
+        private static bool InsertPresentMembers(List<string> members, int meetingId, AttendanceStatus status)
+        {
+            int statusCode = (int)status;
+
+            string insertQuery = "INSERT INTO anwesenheit (hs_kuerzel, meeting_id, anwesenheitsstatus) "
+                    + "VALUES (@hskuerzel, @meetingID, @status)";
+
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(GetConnectionString()))
+                {
+                    OpenConnection(connection);
+
+                    SqlCommand command = new SqlCommand(insertQuery, connection);
+
+                    foreach (string member in members)
+                    {
+                        command.Parameters.Clear(); /* reusing SqlCommand for each iterationm therefore
+                                                            clear parameters before adding new ones */
+                        command.Parameters.AddWithValue("hskuerzel", member);
+                        command.Parameters.AddWithValue("@meetingID", meetingId);
+                        command.Parameters.AddWithValue("@status", statusCode);
+
+                        int rowsAffected = command.ExecuteNonQuery();
+                        if (!IsInsertSuccess(rowsAffected))
+                        {
+                            Console.WriteLine("Error inserting protocol topic data to database.");
+                        }
+                    }                    
+                    return true;
+                }
+                //connection is automatically closed at the end of this block
+            }
+            catch (SqlException ex)
+            {
+                Console.WriteLine("SQL Exception: " + ex.Message);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Exception:  " + ex.Message);
+            }
+            return false;
+        }
+
+        private static bool InsertAbsentMembers(List<string> members, int meetingId, AttendanceStatus status)
+        {
+            int statusCode = (int)status;
+
+            string insertQuery = "INSERT INTO anwesenheit (hs_kuerzel, meeting_id, anwesenheitsstatus) "
+                    + "VALUES (@hskuerzel, @meetingID, @status)";
+
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(GetConnectionString()))
+                {
+                    OpenConnection(connection);
+
+                    SqlCommand command = new SqlCommand(insertQuery, connection);
+
+                    foreach (string member in members)
+                    {
+                        command.Parameters.Clear(); /* reusing SqlCommand for each iterationm therefore
+                                                            clear parameters before adding new ones */
+                        command.Parameters.AddWithValue("hskuerzel", member);
+                        command.Parameters.AddWithValue("@meetingID", meetingId);
+                        command.Parameters.AddWithValue("@status", statusCode);
+
+                        int rowsAffected = command.ExecuteNonQuery();
+                        if (!IsInsertSuccess(rowsAffected))
+                        {
+                            Console.WriteLine("Error inserting protocol topic data to database.");
+                        }
+                    }
+                    return true;
+                }
+                //connection is automatically closed at the end of this block
+            }
+            catch (SqlException ex)
+            {
+                Console.WriteLine("SQL Exception: " + ex.Message);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Exception:  " + ex.Message);
+            }
             return false;
         }
 
@@ -332,6 +476,18 @@ namespace TMMTMS
             return protocolId;
         }
 
+        private static string GetConnectionString()
+        {
+            SqlConnectionStringBuilder connectionStringBuilder = new SqlConnectionStringBuilder();
+
+            connectionStringBuilder.DataSource = "LAPTOP-D537U6PD\\SQLSERVERTMMTMS";
+            connectionStringBuilder.InitialCatalog = "tmmbase";
+            connectionStringBuilder.IntegratedSecurity = true;
+
+            string connectionString = connectionStringBuilder.ConnectionString;
+
+            return connectionString;
+        }
 
         private static bool IsInsertSuccess(int rowsAffected)
         {
