@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.Data;
+using System.Data.SqlClient;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -14,7 +16,8 @@ namespace TMMTMS
         public MainWindow()
         {
             InitializeComponent();
-
+            datagrid_teammembers.ItemsSource = Datenbank.GetDataViewWithData("teammitglied");
+            ShowNumberOfTeammembers();
         }
 
         /// <summary>
@@ -47,6 +50,10 @@ namespace TMMTMS
             this.Close();
         }
 
-        
+        private void ShowNumberOfTeammembers()
+        {
+            int numberOfTeammembers = Datenbank.CountTeammembers();
+            txtblock_teamember_counter.Text = numberOfTeammembers.ToString() + " Teammitglieder";
+        }
     }
 }

@@ -36,6 +36,7 @@ namespace TMMTMS
         {
             InitializeComponent();
             InitializeObservableListBoxes();
+
         }
 
         /// <summary>

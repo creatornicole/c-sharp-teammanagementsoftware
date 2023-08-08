@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace TMMTMS
 {
@@ -474,7 +475,69 @@ namespace TMMTMS
             return protocolId;
         }
 
-        private static string GetConnectionString()
+        public static int CountTeammembers()
+        {
+            int numberOfTeammembers = 0;
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(GetConnectionString()))
+                {
+                    OpenConnection(connection);
+
+                    string countQuery = "SELECT COUNT(*) FROM teammitglied";
+
+                    using (SqlCommand command = new SqlCommand(countQuery, connection))
+                    {
+                        numberOfTeammembers = Convert.ToInt32(command.ExecuteScalar());
+                    }
+                }
+                //connection is automatically closed at the end of this block
+            }
+            catch (SqlException ex)
+            {
+                Console.WriteLine("SQL Exception: " + ex.Message);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Exception:  " + ex.Message);
+            }
+            return numberOfTeammembers;
+        }
+
+        public static DataView GetDataViewWithData(string table)
+        {
+            DataView dataViewWithData = null;
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(Datenbank.GetConnectionString()))
+                {
+                    Datenbank.OpenConnection(connection);
+
+                    string query = "SELECT * FROM " + table;
+
+                    using (SqlCommand command = new SqlCommand(query, connection))
+                    {
+                        SqlDataAdapter adapter = new SqlDataAdapter(command);
+                        DataTable dataTable = new DataTable(table);
+                        adapter.Fill(dataTable);
+                        dataViewWithData = dataTable.DefaultView;
+
+                    }
+                }
+                //connection is automatically closed at the end of this block
+            }
+            catch (SqlException ex)
+            {
+                Console.WriteLine("SQL Exception: " + ex.Message);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Exception:  " + ex.Message);
+            }
+            return dataViewWithData;
+        }
+
+        public static string GetConnectionString()
         {
             SqlConnectionStringBuilder connectionStringBuilder = new SqlConnectionStringBuilder();
 
