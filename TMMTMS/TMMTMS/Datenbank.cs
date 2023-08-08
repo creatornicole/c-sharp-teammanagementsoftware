@@ -236,12 +236,9 @@ namespace TMMTMS
         
         private static bool InsertProtocolData(Protocol protocol, int meetingId)
         {
-            DateTime meetingDate = protocol.MeetingDate;
-            DateTime createDate = protocol.CreateDate;
-
             if(meetingId != -1) {
-                string insertQuery = "INSERT INTO protokoll (meeting_id) "
-                        + "VALUES (@meetingID)";
+                string insertQuery = "INSERT INTO protokoll (meeting_id, meetingdatum, verfassungsdatum) "
+                        + "VALUES (@meetingID, @meetingDate, @createDate)";
 
                 try
                 {
@@ -254,8 +251,8 @@ namespace TMMTMS
                         SqlCommand insertProtocolDataCommand = new SqlCommand(insertQuery, connection);
 
                         insertProtocolDataCommand.Parameters.AddWithValue("@meetingID", meetingId);
-                        //insertProtocolDataCommand.Parameters.AddWithValue("@meetingDate", protocol.MeetingDate);
-                        //insertProtocolDataCommand.Parameters.AddWithValue("@createDate", protocol.CreateDate);
+                        insertProtocolDataCommand.Parameters.AddWithValue("@meetingDate", protocol.MeetingDate);
+                        insertProtocolDataCommand.Parameters.AddWithValue("@createDate", protocol.CreateDate);
 
                         int rowsAffected = insertProtocolDataCommand.ExecuteNonQuery();
                         if (!IsInsertSuccess(rowsAffected))
@@ -280,43 +277,44 @@ namespace TMMTMS
 
         private static bool InsertProtocolTopicData(ProtocolTopic topic, int protocolId)
         {
-            string headline = topic.Headline;
-            List<string> contentAsList = topic.Content;
-            string contentAsString = topic.GetContentAsString(contentAsList);
-
-            string insertQuery = "INSERT INTO protokollthema (ueberschrift, protokoll_id, inhalt) "
-                    + "VALUES (@headline, @protocolID, @content)";
-
-            try
+            if(protocolId != -1)
             {
-                using (SqlConnection connection = new SqlConnection(GetConnectionString()))
+                List<string> contentAsList = topic.Content;
+                string contentAsString = topic.GetContentAsString(contentAsList);
+
+                string insertQuery = "INSERT INTO protokollthema (ueberschrift, protokoll_id, inhalt) "
+                        + "VALUES (@headline, @protocolID, @content)";
+
+                try
                 {
-                    OpenConnection(connection);
-
-                    SqlCommand command = new SqlCommand(insertQuery, connection);
-
-                    command.Parameters.AddWithValue("@headline", headline);
-                    command.Parameters.AddWithValue("@protocolID", protocolId);
-                    command.Parameters.AddWithValue("@content", contentAsString);
-
-                    int rowsAffected = command.ExecuteNonQuery();
-                    if (!IsInsertSuccess(rowsAffected))
+                    using (SqlConnection connection = new SqlConnection(GetConnectionString()))
                     {
-                        Console.WriteLine("Error inserting protocol topic data to database.");
-                    }
-                    return true;
-                }
-                //connection is automatically closed at the end of this block
-            }
-            catch (SqlException ex)
-            {
-                Console.WriteLine("SQL Exception: " + ex.Message);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Exception:  " + ex.Message);
-            }
+                        OpenConnection(connection);
 
+                        SqlCommand command = new SqlCommand(insertQuery, connection);
+
+                        command.Parameters.AddWithValue("@headline", topic.Headline);
+                        command.Parameters.AddWithValue("@protocolID", protocolId);
+                        command.Parameters.AddWithValue("@content", contentAsString);
+
+                        int rowsAffected = command.ExecuteNonQuery();
+                        if (!IsInsertSuccess(rowsAffected))
+                        {
+                            Console.WriteLine("Error inserting protocol topic data to database.");
+                        }
+                        return true;
+                    }
+                    //connection is automatically closed at the end of this block
+                }
+                catch (SqlException ex)
+                {
+                    Console.WriteLine("SQL Exception: " + ex.Message);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Exception:  " + ex.Message);
+                }
+            }
             return false;
         }
 
@@ -359,7 +357,7 @@ namespace TMMTMS
                         int rowsAffected = command.ExecuteNonQuery();
                         if (!IsInsertSuccess(rowsAffected))
                         {
-                            Console.WriteLine("Error inserting protocol topic data to database.");
+                            Console.WriteLine("Error inserting present members to database.");
                         }
                     }                    
                     return true;
@@ -403,7 +401,7 @@ namespace TMMTMS
                         int rowsAffected = command.ExecuteNonQuery();
                         if (!IsInsertSuccess(rowsAffected))
                         {
-                            Console.WriteLine("Error inserting protocol topic data to database.");
+                            Console.WriteLine("Error inserting absent members to database.");
                         }
                     }
                     return true;

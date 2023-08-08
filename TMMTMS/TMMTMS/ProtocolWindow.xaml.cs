@@ -146,8 +146,7 @@ namespace TMMTMS
 
         private Protocol CreateProtocol(Meeting meeting)
         {
-            DateTime currentDate = DateTime.Now;
-            return new Protocol(meeting, meeting.Date, currentDate);
+            return new Protocol(meeting, meeting.Date);
         }
 
         private ProtocolTopic CreateProtocolTopic(Protocol protocol)

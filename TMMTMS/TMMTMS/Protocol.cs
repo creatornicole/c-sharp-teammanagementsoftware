@@ -11,11 +11,11 @@ namespace TMMTMS
         private Meeting meeting;
         private DateTime meetingDate;
         private DateTime createDate;
-        public Protocol(Meeting meeting, DateTime meetingDate, DateTime createDate) 
+        public Protocol(Meeting meeting, DateTime meetingDate) 
         {
             Meeting = meeting;
             MeetingDate = meetingDate;
-            CreateDate = createDate;
+            CreateDate = DateTime.Now;
         }
 
         public Meeting Meeting 
