@@ -85,7 +85,16 @@
 
                 <Grid Grid.Row="1">
                     <DataGrid Name="datagrid_attendance" AutoGenerateColumns="False">
-                        <!-- Columns will be added dynamically in code -->
+                        <DataGrid.Columns>
+                            <DataGridTemplateColumn>
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding}" />
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <!-- Columns will be added dynamically in code -->
+                        </DataGrid.Columns>
                     </DataGrid>
                 </Grid>
                 

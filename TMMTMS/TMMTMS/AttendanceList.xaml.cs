@@ -51,6 +51,15 @@ namespace TMMTMS
 
         private void LoadDataGrid()
         {
+            AddColumnsDynamically();
+            AddMembersToDataGrid();
+            AddAttendanceStatus();
+            
+            
+        }
+
+        private void AddColumnsDynamically()
+        {
             //retrieve column names from database
             List<string> columnNames = new List<string>();
             try
@@ -63,7 +72,7 @@ namespace TMMTMS
 
                     using (SqlCommand command = new SqlCommand(query, connection))
                     {
-                        using(SqlDataReader reader = command.ExecuteReader())
+                        using (SqlDataReader reader = command.ExecuteReader())
                         {
                             while (reader.Read())
                             {
@@ -96,8 +105,17 @@ namespace TMMTMS
                 column.Binding = new Binding(columnName);
                 datagrid_attendance.Columns.Add(column);
             }
-            
         }
 
+        private void AddMembersToDataGrid()
+        {
+            List<string> teammemberNames = Datenbank.GetTeammemberNames();
+            datagrid_attendance.ItemsSource = teammemberNames;
+        }
+
+        private void AddAttendanceStatus()
+        {
+            
+        }
     }
 }

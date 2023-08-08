@@ -139,9 +139,9 @@ namespace TMMTMS
             return teammembernames;
         }
 
-        public static List<string> GetHsKuerzelFromTeammemberNames(List<string> teammembernames)
+        public static string GetHsKuerzelFromTeammemberName(string teammembername)
         {
-            List<string> hskuerzel = new List<string>();
+            string hskuerzel = null;
             string firstName = null;
             string lastName = null;
 
@@ -155,31 +155,25 @@ namespace TMMTMS
 
                     using (SqlCommand command = new SqlCommand(query, connection))
                     {
-                        foreach(string name in teammembernames)
+                        string[] parts = teammembername.Split(','); //name format: 'lastName, firstName'
+                        if (parts.Length == 2)
                         {
-                            string[] parts = name.Split(','); //name form: 'lastName, firstName'
-                            if (parts.Length == 2)
-                            {
-                                firstName = parts[1].Trim(); //remove whitespaces
-                                lastName = parts[0].Trim();
-                            }
-
-                            command.Parameters.Clear(); /* reusing SqlCommand for each iterationm therefore
-                                                            clear parameters before adding new ones */
-                            command.Parameters.AddWithValue("@vorname", firstName);
-                            command.Parameters.AddWithValue("@nachname", lastName);
+                            firstName = parts[1].Trim(); //remove whitespaces
+                            lastName = parts[0].Trim();
+                        }
+    
+                        command.Parameters.AddWithValue("@vorname", firstName);
+                        command.Parameters.AddWithValue("@nachname", lastName);
 
                             using (SqlDataReader reader = command.ExecuteReader())
                             {
                                 if (reader.Read())
                                 {
-                                    string kuerzel = reader["hs_kuerzel"].ToString();
-                                    hskuerzel.Add(kuerzel);
+                                    hskuerzel = reader["hs_kuerzel"].ToString();
                                 }
                             }
                             /* using statement ensures that SqlDataReader is properly disposed of when it goes out of scope
                                 that includes closing the reader */
-                        }
                     }
                 }
                 //connection is automatically closed at the end of this block
@@ -194,6 +188,18 @@ namespace TMMTMS
             }
 
             return hskuerzel;
+        }
+
+        public static List<string> GetHsKuerzelFromTeammemberNames(List<string> teammembernames)
+        {
+            List<string> hskuerzelList = new List<string>();
+            
+            foreach(string teammembername in teammembernames)
+            {
+                string hskuerzel = GetHsKuerzelFromTeammemberName(teammembername);
+                hskuerzelList.Add(hskuerzel);
+            }
+            return hskuerzelList;
         }
 
         private static bool InsertMeetingData(Meeting meeting)
