@@ -83,10 +83,12 @@
                            HorizontalAlignment="Left" Foreground="#121518"/>
                 </Grid>
 
+                <Grid Grid.Row="1">
+                    <DataGrid Name="datagrid_attendance" AutoGenerateColumns="False">
+                        <!-- Columns will be added dynamically in code -->
+                    </DataGrid>
+                </Grid>
                 
-
-
-
                 <Separator Margin="75, 10" Grid.Row="6" Height="0.8" Background="#333333"/>
 
                 <TextBlock Grid.Row="7" FontSize="8" Foreground="#121518" TextAlignment="Center">

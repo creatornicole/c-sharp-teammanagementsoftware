@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,14 +16,12 @@ using System.Windows.Shapes;
 
 namespace TMMTMS
 {
-    /// <summary>
-    /// Interaktionslogik für AttendanceList.xaml
-    /// </summary>
     public partial class AttendanceList : Window
     {
         public AttendanceList()
         {
             InitializeComponent();
+            LoadDataGrid();
         }
 
         /// <summary>
@@ -35,7 +35,6 @@ namespace TMMTMS
             {
                 this.DragMove();
             }
-
         }
 
         private void Button_SwitchToTeammemberListPage(object sender, RoutedEventArgs e)
@@ -48,6 +47,56 @@ namespace TMMTMS
         {
             SwitchWindowHelper.SwitchToProtocolPage();
             this.Close();
+        }
+
+        private void LoadDataGrid()
+        {
+            //retrieve column names from database
+            List<string> columnNames = new List<string>();
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(Datenbank.GetConnectionString()))
+                {
+                    Datenbank.OpenConnection(connection);
+
+                    string query = "SELECT bezeichnung, datum FROM meeting";
+
+                    using (SqlCommand command = new SqlCommand(query, connection))
+                    {
+                        using(SqlDataReader reader = command.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                string name = reader["bezeichnung"].ToString();
+                                string date = reader["datum"].ToString();
+                                string columnName = name + "\n " + date;
+
+                                columnNames.Add(columnName);
+                            }
+                        }
+
+                    }
+                }
+                //connection is automatically closed at the end of this block
+            }
+            catch (SqlException ex)
+            {
+                Console.WriteLine("SQL Exception: " + ex.Message);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Exception:  " + ex.Message);
+            }
+
+            //dynamically create DataGrid columns
+            foreach (string columnName in columnNames)
+            {
+                DataGridTextColumn column = new DataGridTextColumn();
+                column.Header = columnName;
+                column.Binding = new Binding(columnName);
+                datagrid_attendance.Columns.Add(column);
+            }
+            
         }
 
     }

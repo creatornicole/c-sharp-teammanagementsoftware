@@ -122,7 +122,6 @@ namespace TMMTMS
 
                                 teammembernames.Add(completeName);
                             }
-                            reader.Close();
                         }
                     }
                 }
