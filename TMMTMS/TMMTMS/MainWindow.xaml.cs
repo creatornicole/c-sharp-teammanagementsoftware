@@ -25,8 +25,6 @@ namespace TMMTMS
         /// Enables Drag Move with Left Mouse Down
         /// 
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
         private void Border_MouseDown(object sender, MouseButtonEventArgs e)
         {
             if(e.ChangedButton == MouseButton.Left)
@@ -38,15 +36,19 @@ namespace TMMTMS
 
         private void Button_SwitchToAddPage(object sender, EventArgs e)
         {
-            Window1 win = new Window1();
-            win.Show();
+            SwitchWindowHelper.SwitchToAddPage();
+            this.Close();
+        }
+
+        private void Button_SwitchToAttendanceListPage(object sender, EventArgs e)
+        {
+            SwitchWindowHelper.SwitchToAttendanceListPage();
             this.Close();
         }
 
         private void Button_SwitchToProtocolPage(object sender, EventArgs e)
         {
-            ProtocolWindow protocolWindow = new ProtocolWindow();
-            protocolWindow.Show();
+            SwitchWindowHelper.SwitchToProtocolPage();
             this.Close();
         }
 

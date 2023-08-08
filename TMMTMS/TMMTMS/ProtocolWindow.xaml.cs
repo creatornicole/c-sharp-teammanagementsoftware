@@ -160,5 +160,17 @@ namespace TMMTMS
             };
             return new ProtocolTopic(protocol, this.textboxValueProtokollthema, content);
         }
+
+        private void Button_SwitchToTeammemberListPage(object sender, EventArgs e)
+        {
+            SwitchWindowHelper.SwitchToTeammemberListPage();
+            this.Close();
+        }
+
+        private void Button_SwitchToAttendanceListPage(object sender, EventArgs e)
+        {
+            SwitchWindowHelper.SwitchToAttendanceListPage();
+            this.Close();
+        }
     }
 }

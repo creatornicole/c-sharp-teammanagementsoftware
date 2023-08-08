@@ -41,19 +41,19 @@
 
                         <!-- Menu Buttons -->
                         <StackPanel DockPanel.Dock="Top">
-                            <Button Style="{StaticResource menuButton}">
+                            <Button Click="Button_SwitchToTeammemberListPage" Style="{StaticResource menuButton}">
                                 <StackPanel Orientation="Horizontal">
                                     <!-- TODO: Add Icon -->
                                     <TextBlock Text="Team"/>
                                 </StackPanel>
                             </Button>
-                            <Button Style="{StaticResource menuButton}">
+                            <Button Click="Button_SwitchToAttendanceListPage" Style="{StaticResource menuButton}">
                                 <StackPanel Orientation="Horizontal">
                                     <!-- TODO: Add Icon -->
                                     <TextBlock Text="Anwesenheitsliste"/>
                                 </StackPanel>
                             </Button>
-                            <Button Style="{StaticResource menuButton}">
+                            <Button Click="Button_SwitchToProtocolPage" Style="{StaticResource menuButton}">
                                 <StackPanel Orientation="Horizontal">
                                     <!-- TODO: Add Icon -->
                                     <TextBlock Text="Protokoll"/>
