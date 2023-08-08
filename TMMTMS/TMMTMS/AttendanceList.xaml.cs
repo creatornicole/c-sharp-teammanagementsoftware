@@ -72,24 +72,5 @@ namespace TMMTMS
                 datagrid_attendance.Columns.Add(column);
             }
         }
-
-        /*
-        private void AddAttendanceStatus()
-        {
-            List<string> hskuerzelList = Datenbank.GetHsKuerzel();
-            foreach(string hskuerzel in hskuerzelList)
-            {
-                List<int> attendanceStates = Datenbank.GetAttendanceOfHsKuerzel(hskuerzel);
-                List<string> attendanceStatesAsString = new List<string>();
-                foreach(int state in  attendanceStates)
-                {
-                    string stateAsString = Convert.ToString(state);
-                    attendanceStatesAsString.Add(stateAsString);
-                }
-                string statesAsOneString = OperationHelper.GetListStringAsOneString(attendanceStatesAsString);
-                MessageBoxHelper.ShowSuccessPopUp(hskuerzel + " " + statesAsOneString);
-            }
-        }
-        */
     }
 }
