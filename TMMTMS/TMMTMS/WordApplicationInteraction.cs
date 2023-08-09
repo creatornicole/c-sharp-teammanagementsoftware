@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Office.Interop.Word;
+using System.Runtime.InteropServices;
 
 namespace TMMTMS
 {
@@ -14,6 +15,7 @@ namespace TMMTMS
             Application wordApplication = OpenWordApplication();
             Document wordDocument = CreateEmptyWordDocument(wordApplication);
             AddProtocolContentToWordDocument(wordDocument, protocol, meeting, topic);
+            ReleaseDocumentAndWordApplication(wordDocument, wordApplication);
         }
 
         private static string GenerateProtocolData(Protocol protocol, Meeting meeting, ProtocolTopic topic)
@@ -62,5 +64,10 @@ namespace TMMTMS
             return wordDocument;
         }
         
+        private static void ReleaseDocumentAndWordApplication(Document wordDocument, Application wordApplication)
+        {
+            Marshal.ReleaseComObject(wordDocument);
+            Marshal.ReleaseComObject(wordApplication);
+        }
     }
 }
