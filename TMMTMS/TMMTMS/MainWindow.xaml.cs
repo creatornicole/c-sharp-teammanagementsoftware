@@ -52,6 +52,12 @@ namespace TMMTMS
             this.Close();
         }
 
+        private void Button_SwitchToSendMailPage(object sender, EventArgs e)
+        {
+            SwitchWindowHelper.SwitchToSendMailPage();
+            this.Close();
+        }
+
         private void ShowNumberOfTeammembers()
         {
             int numberOfTeammembers = Datenbank.CountTeammembers();

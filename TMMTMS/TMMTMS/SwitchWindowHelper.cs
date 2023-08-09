@@ -31,5 +31,11 @@ namespace TMMTMS
             Window1 win = new Window1();
             win.Show();
         }
+
+        public static void SwitchToSendMailPage()
+        {
+            SendMailPage sendMailPage = new SendMailPage();
+            sendMailPage.Show();
+        }
     }
 }

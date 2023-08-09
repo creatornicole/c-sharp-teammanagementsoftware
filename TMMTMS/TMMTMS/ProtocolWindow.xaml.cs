@@ -62,35 +62,62 @@ namespace TMMTMS
             }
         }
 
-        private void Button_TogglePresentMemberSelection(object sender, EventArgs e)
-        {
-            //Toggle Functionality
-        }
-
-        private void Button_ToggleAbsentMemberSelection(object sender, EventArgs e)
-        {
-            //Toggle Functionality
-        }
-
         private void Button_AddProtocol(object sender, EventArgs e)
         {
-            ReadProtocolInputData();
-            Meeting meeting = CreateMeeting();
-            Protocol protocol = CreateProtocol(meeting);
-            ProtocolTopic protocolTopic = CreateProtocolTopic(protocol);
-            
-            if (Datenbank.StoreProtocol(meeting, protocol, protocolTopic))
+            if(AreInputsValid())
             {
-                ClearInputs();
-                MessageBoxHelper.ShowSuccessPopUp("Protokolldaten wurden erfolgreich in die Datenbank getragen.");
+                ReadProtocolInputData();
+                Meeting meeting = CreateMeeting();
+                Protocol protocol = CreateProtocol(meeting);
+                ProtocolTopic protocolTopic = CreateProtocolTopic(protocol);
+
+                if (Datenbank.StoreProtocol(meeting, protocol, protocolTopic))
+                {
+                    ClearInputs();
+                    MessageBoxHelper.ShowSuccessPopUp("Protokolldaten wurden erfolgreich in die Datenbank getragen.");
+                }
+                else
+                {
+                    MessageBoxHelper.ShowFailurePopUp("Teammitglied konnte nicht in der Datenbank gespeichert werden.");
+                }
+
+                //Ask for Export to Word-Doc (und Pdf?)
+            } else
+            {
+                MessageBoxHelper.ShowFailurePopUp("Eingabe(n) fehlerhaft oder unvollständig.");
             }
+
+
+        }
+
+        private bool AreInputsValid()
+        {
+            string bezeichnungInput = txtbox_eventbezeichnung.Text;
+            string locationInput = txtbox_location.Text;
+            string protokollthemaInput = txtbox_protokollthema1.Text;            
+            DateTime dateInput = datepicker_eventdatum.SelectedDate.Value;
+            Object timeSelectedItem = InputFormHelper.GetValueFromComboBoxItem(combobox_time.SelectedItem);
+
+            string stichpunkt1Input = txtbox_protokollthema1_stichpunkt1.Text;
+            string stichpunkt2Input = txtbox_protokollthema1_stichpunkt2.Text;
+            string stichpunkt3Input = txtbox_protokollthema1_stichpunkt3.Text;
+            string protokollInhalt = stichpunkt1Input + " " + stichpunkt2Input + " " + stichpunkt3Input;
+
+            //not needed to be checked because of strict selection
+            //this.selectedPresentMembers = InputFormHelper.GetSelectedListBoxItemsAsStrings(listBoxPresentMembers);
+            //this.selectedAbsentMembers = InputFormHelper.GetSelectedListBoxItemsAsStrings(listBoxAbsentMembers); ;
+
+            //Max-Length because of Database Restrictions (see database implementation)
+            if (ValidationHelper.IsStringValid(bezeichnungInput, 50) && ValidationHelper.IsStringValid(locationInput, 30)
+                && ValidationHelper.IsStringValid(protokollthemaInput, 30) && ValidationHelper.IsStringValid(protokollInhalt, 1080)
+                && ValidationHelper.IsDateValid(dateInput) && ValidationHelper.IsComboBoxSelectedItemValid(timeSelectedItem))
+            {
+                return true;
+            } 
             else
             {
-                MessageBoxHelper.ShowFailurePopUp("Teammitglied konnte nicht in der Datenbank gespeichert werden.");
+                return false;
             }
-
-            //Ask for Export to Word-Doc (und Pdf?)
-
         }
 
         private void ReadProtocolInputData()

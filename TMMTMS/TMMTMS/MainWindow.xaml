@@ -85,7 +85,7 @@
 
                 <Grid Grid.Row="2">
                     <!-- Add Button -->
-                    <Button Style="{StaticResource mailButton}">
+                    <Button Click="Button_SwitchToSendMailPage" Style="{StaticResource mailButton}">
                         @
                     </Button>
 

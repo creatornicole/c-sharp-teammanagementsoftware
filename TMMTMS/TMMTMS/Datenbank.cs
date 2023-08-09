@@ -633,7 +633,7 @@ namespace TMMTMS
             return dataViewWithData;
         }
 
-        public static string GetConnectionString()
+        private static string GetConnectionString()
         {
             SqlConnectionStringBuilder connectionStringBuilder = new SqlConnectionStringBuilder();
 

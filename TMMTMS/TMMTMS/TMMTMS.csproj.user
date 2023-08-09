@@ -13,6 +13,9 @@
     <Compile Update="ProtocolWindow.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Update="SendMailPage.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="Window1.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -25,6 +28,9 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Update="ProtocolWindow.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="SendMailPage.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Update="Window1.xaml">

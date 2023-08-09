@@ -141,10 +141,10 @@
                 </Grid>
 
                 <Grid Grid.Row="2">
-                    <Button Click="Button_TogglePresentMemberSelection" Style="{StaticResource anwesendButton}">
+                    <Button Style="{StaticResource anwesendButton}">
                         Anwesend
                     </Button>
-                    <Button Click="Button_ToggleAbsentMemberSelection" Style="{StaticResource abwesendButton}" Margin="326,20,0,0">
+                    <Button Style="{StaticResource abwesendButton}" Margin="326,20,0,0">
                         Abwesend
                     </Button>
                 </Grid>
