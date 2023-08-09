@@ -13,10 +13,13 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using Microsoft.Office.Interop.Word;
 
 namespace TMMTMS
 {
-    public partial class ProtocolWindow : Window
+    public partial class ProtocolWindow : System.Windows.Window /* explizite Angabe, da mehrdeutiger Verweis 
+                                                                   durch Microsoft.Office.Interop.Word */
+                                                                               
     {
         private string textboxValueBezeichnung;
         private string textboxValueLocation;
@@ -36,7 +39,6 @@ namespace TMMTMS
         {
             InitializeComponent();
             InitializeObservableListBoxes();
-
         }
 
         /// <summary>
@@ -81,13 +83,12 @@ namespace TMMTMS
                     MessageBoxHelper.ShowFailurePopUp("Teammitglied konnte nicht in der Datenbank gespeichert werden.");
                 }
 
-                //Ask for Export to Word-Doc (und Pdf?)
+                WordApplicationInteraction.GenerateProtocolAsWordDocument(protocol, meeting, protocolTopic);
+
             } else
             {
                 MessageBoxHelper.ShowFailurePopUp("Eingabe(n) fehlerhaft oder unvollständig.");
             }
-
-
         }
 
         private bool AreInputsValid()
@@ -199,5 +200,6 @@ namespace TMMTMS
             SwitchWindowHelper.SwitchToAttendanceListPage();
             this.Close();
         }
+
     }
 }

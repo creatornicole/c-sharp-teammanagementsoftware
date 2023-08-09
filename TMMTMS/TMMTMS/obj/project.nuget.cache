@@ -1,10 +1,11 @@
 {
   "version": 2,
-  "dgSpecHash": "UDHhI1qJtP6zwbsK5VfTH/zdyn6xuP4nfbgc1VL63HRP8AbJ8T/IpIwr2wL/2mi3QboaRcqI//yuO3ysXuIjsQ==",
+  "dgSpecHash": "cGKQd+ZkVgoTZoHtWs88zNKy+lPdt6ZuJdfc0feBQ6pckWOKJuAOrgTkuFr0AVqwJkcUyv12I7bq+OjKCTL0qA==",
   "success": true,
   "projectFilePath": "D:\\Stuff\\Studium\\HSMW\\IF21wS1-B\\4_c#\\pruefungsbeleg\\TMMTMS\\TMMTMS\\TMMTMS.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\ngott\\.nuget\\packages\\microsoft.netcore.platforms\\3.1.0\\microsoft.netcore.platforms.3.1.0.nupkg.sha512",
+    "C:\\Users\\ngott\\.nuget\\packages\\microsoft.office.interop.outlook\\15.0.4797.1004\\microsoft.office.interop.outlook.15.0.4797.1004.nupkg.sha512",
     "C:\\Users\\ngott\\.nuget\\packages\\microsoft.win32.registry\\4.7.0\\microsoft.win32.registry.4.7.0.nupkg.sha512",
     "C:\\Users\\ngott\\.nuget\\packages\\runtime.native.system.data.sqlclient.sni\\4.7.0\\runtime.native.system.data.sqlclient.sni.4.7.0.nupkg.sha512",
     "C:\\Users\\ngott\\.nuget\\packages\\runtime.win-arm64.runtime.native.system.data.sqlclient.sni\\4.4.0\\runtime.win-arm64.runtime.native.system.data.sqlclient.sni.4.4.0.nupkg.sha512",

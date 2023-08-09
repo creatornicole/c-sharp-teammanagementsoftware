@@ -61,7 +61,7 @@ namespace TMMTMS {
                 return;
             }
             _contentLoaded = true;
-            System.Uri resourceLocater = new System.Uri("/TMMTMS;V1.0.0.0;component/attendancelist.xaml", System.UriKind.Relative);
+            System.Uri resourceLocater = new System.Uri("/TMMTMS;component/attendancelist.xaml", System.UriKind.Relative);
             
             #line 1 "..\..\..\AttendanceList.xaml"
             System.Windows.Application.LoadComponent(this, resourceLocater);

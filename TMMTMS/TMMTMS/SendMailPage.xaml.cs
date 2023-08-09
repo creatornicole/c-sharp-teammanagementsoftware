@@ -1,17 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Mail;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
 namespace TMMTMS
 {
@@ -38,6 +27,8 @@ namespace TMMTMS
 
         private void Button_SendMail(object sender, EventArgs e)
         {
+            //TODO for further Development
+            MessageBoxHelper.ShowFailurePopUp("Mailversand noch in Bearbeitung.");
         }
 
         private void Button_SwitchToTeammemberListPage(object sender, EventArgs e)

@@ -36,3 +36,5 @@ D:\Stuff\Studium\HSMW\IF21wS1-B\4_c#\pruefungsbeleg\TMMTMS\TMMTMS\obj\Debug\net6
 D:\Stuff\Studium\HSMW\IF21wS1-B\4_c#\pruefungsbeleg\TMMTMS\TMMTMS\obj\Debug\net6.0-windows\AttendanceList.g.cs
 D:\Stuff\Studium\HSMW\IF21wS1-B\4_c#\pruefungsbeleg\TMMTMS\TMMTMS\obj\Debug\net6.0-windows\SendMailPage.baml
 D:\Stuff\Studium\HSMW\IF21wS1-B\4_c#\pruefungsbeleg\TMMTMS\TMMTMS\obj\Debug\net6.0-windows\SendMailPage.g.cs
+D:\Stuff\Studium\HSMW\IF21wS1-B\4_c#\pruefungsbeleg\TMMTMS\TMMTMS\bin\Debug\net6.0-windows\Microsoft.Office.Interop.Outlook.dll
+D:\Stuff\Studium\HSMW\IF21wS1-B\4_c#\pruefungsbeleg\TMMTMS\TMMTMS\obj\Debug\net6.0-windows\Interop.Microsoft.Office.Interop.Word.dll
