@@ -190,6 +190,62 @@ namespace TMMTMS
             return hskuerzel;
         }
 
+        private static string GetTeammembernameFromHsKuerzel(string hskuerzel)
+        {
+            string teammembername = null;
+            string firstName = null;
+            string lastName = null;
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(GetConnectionString()))
+                {
+                    OpenConnection(connection);
+
+                    string query = "SELECT vorname, nachname FROM teammitglied WHERE hs_kuerzel = @hskuerzel";
+
+                    using (SqlCommand command = new SqlCommand(query, connection))
+                    {
+                        command.Parameters.AddWithValue("@hskuerzel", hskuerzel);
+
+                        using (SqlDataReader reader = command.ExecuteReader())
+                        {
+                            if (reader.Read())
+                            {
+                                firstName = reader["vorname"].ToString();
+                                lastName = reader["nachname"].ToString();
+                                teammembername = firstName + " " + lastName;
+                            }
+                        }
+                        /* using statement ensures that SqlDataReader is properly disposed of when it goes out of scope
+                            that includes closing the reader */
+                    }
+                }
+                //connection is automatically closed at the end of this block
+            }
+            catch (SqlException ex)
+            {
+                Console.WriteLine("SQL Exception: " + ex.Message);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Exception:  " + ex.Message);
+            }
+
+            return teammembername;
+        }
+
+        public static List<string> GetTeammembernamesFromHsKuerzelList(List<string> hskuerzelList)
+        {
+            List<string> teammembernames = new List<string>();
+
+            foreach (string hskuerzel in hskuerzelList)
+            {
+                string teammembername = GetTeammembernameFromHsKuerzel(hskuerzel);
+                teammembernames.Add(teammembername);
+            }
+            return teammembernames;
+        }
+
         public static List<string> GetAttendanceDataOfTeammember(string hskuerzel)
         {
             List<string> attendanceStates = new List<string>();

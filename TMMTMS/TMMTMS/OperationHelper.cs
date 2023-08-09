@@ -13,5 +13,17 @@ namespace TMMTMS
             string contentAsString = string.Join(" ", contentAsList);
             return contentAsString;
         }
+
+        public static string GetListStringAsOneStringSeparatedByComma(List<string> contentAsList)
+        {
+            string contentAsString = string.Join(", ", contentAsList);
+            return contentAsString;
+        }
+
+        public static string GetListStringAsOneStringSeparatedByNewLine(List<string> contentAsList)
+        {
+            string contentAsString = string.Join("\n", contentAsList);
+            return contentAsString;
+        }
     }
 }
