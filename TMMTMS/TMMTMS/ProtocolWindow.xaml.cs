@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -35,10 +36,59 @@ namespace TMMTMS
         private ObservableCollection<string> presentMemberCollection;
         private ObservableCollection<string> absentMemberCollection;
 
+        private BackgroundWorker backgroundWorkerToStoreProtocol;
+        private BackgroundWorker backgroundWorkerToGenerateWordDoc;
+        private Meeting meeting;
+        private Protocol protocol;
+        private ProtocolTopic topic;
+
         public ProtocolWindow()
         {
             InitializeComponent();
             InitializeObservableListBoxes();
+            InitializeBackgroundworkerToStoreProtocol();
+            InitializeBackgroundworkerToGenerateWordDoc();
+        }
+
+        private void InitializeObservableListBoxes()
+        {
+            //OberservableCollection for ListBox Collection to Add Items from Database
+            presentMemberCollection = new ObservableCollection<string>();
+            //Bind the ObservableCollection to the ListBox ItemsSource
+            listBoxPresentMembers.ItemsSource = presentMemberCollection;
+
+            absentMemberCollection = new ObservableCollection<string>();
+            listBoxAbsentMembers.ItemsSource = absentMemberCollection;
+
+            AddMembersToListBox(presentMemberCollection);
+            AddMembersToListBox(absentMemberCollection);
+        }
+
+        private void InitializeBackgroundworkerToStoreProtocol()
+        {
+            backgroundWorkerToStoreProtocol = new BackgroundWorker();
+            backgroundWorkerToStoreProtocol.DoWork += Backgroundworker_StoreProtocol;
+            backgroundWorkerToStoreProtocol.RunWorkerCompleted += Backgroundworker_ClearInputs;
+            backgroundWorkerToStoreProtocol.WorkerSupportsCancellation = false;
+            backgroundWorkerToStoreProtocol.WorkerReportsProgress = false;
+        }
+
+        private void InitializeBackgroundworkerToGenerateWordDoc()
+        {
+            backgroundWorkerToGenerateWordDoc = new BackgroundWorker();
+            backgroundWorkerToGenerateWordDoc.DoWork += Backgroundworker_GenerateWordDoc;
+            backgroundWorkerToGenerateWordDoc.WorkerSupportsCancellation = false;
+            backgroundWorkerToGenerateWordDoc.WorkerReportsProgress = false;
+        }
+
+        private void Backgroundworker_StoreProtocol(object sender, DoWorkEventArgs e)
+        {
+            Datenbank.StoreProtocol(this.meeting, this.protocol, this.topic);
+        }
+
+        private void Backgroundworker_GenerateWordDoc(object sender, DoWorkEventArgs e)
+        {
+            WordApplicationInteraction.GenerateProtocolAsWordDocument(this.protocol, this.meeting, this.topic);
         }
 
         /// <summary>
@@ -61,33 +111,6 @@ namespace TMMTMS
             foreach (string member in members)
             {
                 collection.Add(member);
-            }
-        }
-
-        private void Button_AddProtocol(object sender, EventArgs e)
-        {
-            if(AreInputsValid())
-            {
-                ReadProtocolInputData();
-                Meeting meeting = CreateMeeting();
-                Protocol protocol = CreateProtocol(meeting);
-                ProtocolTopic protocolTopic = CreateProtocolTopic(protocol);
-
-                if (Datenbank.StoreProtocol(meeting, protocol, protocolTopic))
-                {
-                    ClearInputs();
-                    MessageBoxHelper.ShowSuccessPopUp("Protokolldaten wurden erfolgreich in die Datenbank getragen.");
-                }
-                else
-                {
-                    MessageBoxHelper.ShowFailurePopUp("Teammitglied konnte nicht in der Datenbank gespeichert werden.");
-                }
-
-                WordApplicationInteraction.GenerateProtocolAsWordDocument(protocol, meeting, protocolTopic);
-
-            } else
-            {
-                MessageBoxHelper.ShowFailurePopUp("Eingabe(n) fehlerhaft oder unvollständig.");
             }
         }
 
@@ -135,32 +158,27 @@ namespace TMMTMS
             this.textboxValueProtokollthemaStichpunkt3 = txtbox_protokollthema1_stichpunkt3.Text;
         }
 
-        private void ClearInputs()
+        private void Backgroundworker_ClearInputs(object sender, RunWorkerCompletedEventArgs e)
         {
-            txtbox_eventbezeichnung.Clear();
-            txtbox_location.Clear();
-            txtbox_protokollthema1.Clear();
-            txtbox_protokollthema1_stichpunkt1.Clear();
-            txtbox_protokollthema1_stichpunkt2.Clear();
-            txtbox_protokollthema1_stichpunkt3.Clear();
-            datepicker_eventdatum.SelectedDate = DateTime.Now;
-            combobox_time.SelectedIndex = -1;
-            listBoxPresentMembers.SelectedIndex = -1;
-            listBoxAbsentMembers.SelectedIndex = -1;          
-        }
+            if(e.Error == null)
+            {
+                txtbox_eventbezeichnung.Clear();
+                txtbox_location.Clear();
+                txtbox_protokollthema1.Clear();
+                txtbox_protokollthema1_stichpunkt1.Clear();
+                txtbox_protokollthema1_stichpunkt2.Clear();
+                txtbox_protokollthema1_stichpunkt3.Clear();
+                datepicker_eventdatum.SelectedDate = DateTime.Now;
+                combobox_time.SelectedIndex = -1;
+                listBoxPresentMembers.SelectedIndex = -1;
+                listBoxAbsentMembers.SelectedIndex = -1;
 
-        private void InitializeObservableListBoxes()
-        {
-            //OberservableCollection for ListBox Collection to Add Items from Database
-            presentMemberCollection = new ObservableCollection<string>();
-            //Bind the ObservableCollection to the ListBox ItemsSource
-            listBoxPresentMembers.ItemsSource = presentMemberCollection;
-
-            absentMemberCollection = new ObservableCollection<string>();
-            listBoxAbsentMembers.ItemsSource = absentMemberCollection;
-
-            AddMembersToListBox(presentMemberCollection);
-            AddMembersToListBox(absentMemberCollection);
+                MessageBoxHelper.ShowSuccessPopUp("Protokolldaten wurden erfolgreich in die Datenbank getragen.");
+            }
+            else
+            {
+                MessageBoxHelper.ShowFailurePopUp("Teammitglied konnte nicht in der Datenbank gespeichert werden.");
+            }
         }
 
         private Meeting CreateMeeting()
@@ -173,12 +191,12 @@ namespace TMMTMS
                 presentMembersHsKuerzel, absentMembersHsKuerzel);
         }
 
-        private Protocol CreateProtocol(Meeting meeting)
+        private Protocol CreateProtocol()
         {
-            return new Protocol(meeting, meeting.Date);
+            return new Protocol(this.meeting, meeting.Date);
         }
 
-        private ProtocolTopic CreateProtocolTopic(Protocol protocol)
+        private ProtocolTopic CreateProtocolTopic()
         {
             List<string> content = new List<string>
             {
@@ -186,7 +204,25 @@ namespace TMMTMS
                 this.textboxValueProtokollthemaStichpunkt2,
                 this.textboxValueProtokollthemaStichpunkt3
             };
-            return new ProtocolTopic(protocol, this.textboxValueProtokollthema, content);
+            return new ProtocolTopic(this.protocol, this.textboxValueProtokollthema, content);
+        }
+
+        private void Button_AddProtocol(object sender, EventArgs e)
+        {
+            if (AreInputsValid())
+            {
+                ReadProtocolInputData();
+                this.meeting = CreateMeeting();
+                this.protocol = CreateProtocol();
+                this.topic = CreateProtocolTopic();
+
+                backgroundWorkerToStoreProtocol.RunWorkerAsync();
+                backgroundWorkerToGenerateWordDoc.RunWorkerAsync();
+            }
+            else
+            {
+                MessageBoxHelper.ShowFailurePopUp("Eingabe(n) fehlerhaft oder unvollständig.");
+            }
         }
 
         private void Button_SwitchToTeammemberListPage(object sender, EventArgs e)

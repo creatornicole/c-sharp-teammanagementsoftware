@@ -358,10 +358,8 @@
             <Setter Property="Margin" Value="0, 3, 0, 0" />
             <Setter Property="Width" Value="Auto" />
             <Setter Property="Height" Value="Auto" />
-            
+
         </Style>
 
-        <!-- Add Automatic Style (see 21:03) -->
-        
     </Application.Resources>
 </Application>

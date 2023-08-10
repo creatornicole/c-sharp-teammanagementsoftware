@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Windows;
 using System.Windows.Automation;
 using System.Windows.Input;
@@ -21,9 +22,22 @@ namespace TMMTMS
         private DateTime datepickerValueGeburtstag;
         private DateTime datepickerValueEintrittsdatum;
 
+        private BackgroundWorker backgroundWorkerToStoreMember;
+        private Teammitglied teammitglied;
+
         public Window1()
         {
             InitializeComponent();
+            InitializeBackgroundworkerToStoreMember();
+        }
+
+        private void InitializeBackgroundworkerToStoreMember()
+        {
+            backgroundWorkerToStoreMember = new BackgroundWorker();
+            backgroundWorkerToStoreMember.DoWork += Backgroundworker_StoreMember;
+            backgroundWorkerToStoreMember.RunWorkerCompleted += Backgroundworker_ClearInputs;
+            backgroundWorkerToStoreMember.WorkerSupportsCancellation = false;
+            backgroundWorkerToStoreMember.WorkerReportsProgress = false;
         }
 
         /// <summary>
@@ -45,18 +59,9 @@ namespace TMMTMS
             if(AreInputsValid())
             {
                 ReadInputs();
-                Teammitglied teammitglied = CreateMember();
-                bool insertionIsSuccess = teammitglied.StoreMember(teammitglied);
+                this.teammitglied = CreateMember();
 
-                if (insertionIsSuccess)
-                {
-                    ClearInputs();
-                    MessageBoxHelper.ShowSuccessPopUp("Teammitglied wurde erfolgreich in die Datenbank getragen.");
-                }
-                else
-                {
-                    MessageBoxHelper.ShowFailurePopUp("Teammitglied konnte nicht in der Datenbank gespeichert werden.");
-                }                
+                backgroundWorkerToStoreMember.RunWorkerAsync();
             } 
             else
             {
@@ -78,18 +83,32 @@ namespace TMMTMS
             this.comboboxValuePosition = InputFormHelper.GetValueFromComboBoxItem(combobox_rang.SelectedItem);
         }
 
-        private void ClearInputs()
+        private void Backgroundworker_StoreMember(object sender, DoWorkEventArgs e)
         {
-            txtbox_vorname.Clear();
-            txtbox_nachname.Clear();
-            txtbox_handynummer.Clear();
-            combobox_abteilung.SelectedIndex = -1;
-            combobox_bereich.SelectedIndex = -1;
-            combobox_rang.SelectedIndex = -1;
-            txtbox_seminargruppe.Clear();
-            txtbox_hskuerzel.Clear();
-            datepicker_geburtstag.SelectedDate = DateTime.Now;
-            datepicker_eintrittsdatum.SelectedDate = DateTime.Now;
+            this.teammitglied.StoreMember(this.teammitglied);
+        }
+
+        private void Backgroundworker_ClearInputs(object sender, RunWorkerCompletedEventArgs e)
+        {
+            if(e.Error == null)
+            {
+                txtbox_vorname.Clear();
+                txtbox_nachname.Clear();
+                txtbox_handynummer.Clear();
+                combobox_abteilung.SelectedIndex = -1;
+                combobox_bereich.SelectedIndex = -1;
+                combobox_rang.SelectedIndex = -1;
+                txtbox_seminargruppe.Clear();
+                txtbox_hskuerzel.Clear();
+                datepicker_geburtstag.SelectedDate = DateTime.Now;
+                datepicker_eintrittsdatum.SelectedDate = DateTime.Now;
+
+                MessageBoxHelper.ShowSuccessPopUp("Teammitglied wurde erfolgreich in die Datenbank getragen.");
+            }
+            else
+            {
+                MessageBoxHelper.ShowFailurePopUp("Teammitglied konnte nicht in der Datenbank gespeichert werden. " + e.ToString());
+            }
         }
 
         private Teammitglied CreateMember()

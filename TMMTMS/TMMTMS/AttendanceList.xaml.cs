@@ -13,15 +13,47 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using System.ComponentModel;
 
 namespace TMMTMS
 {
     public partial class AttendanceList : Window
     {
+        private BackgroundWorker backgroundWorkerToLoadDynamicColumns;
+        private BackgroundWorker backgroundWorkerToLoadTeammemberColumn;
+        List<string> columnHeaderNames;
+        List<string> teammemberNames;
+
         public AttendanceList()
         {
             InitializeComponent();
-            LoadDataGrid();
+
+            InitializeBackgroundWorkerToLoadDataGrid();
+            InitializeBackgroundWorkerToLoadTeammemberColumn();
+
+            //check for existence of both BackgroundWorkers before running them
+            if (backgroundWorkerToLoadDynamicColumns != null && backgroundWorkerToLoadTeammemberColumn != null)
+            {
+                LoadDataGrid();
+            }
+        }
+
+        private void InitializeBackgroundWorkerToLoadDataGrid()
+        {
+            backgroundWorkerToLoadDynamicColumns = new BackgroundWorker();
+            backgroundWorkerToLoadDynamicColumns.DoWork += Backgroundworker_GetMeetingNames;
+            backgroundWorkerToLoadDynamicColumns.RunWorkerCompleted += Backgroundworker_LoadColumns;
+            backgroundWorkerToLoadDynamicColumns.WorkerSupportsCancellation = false;
+            backgroundWorkerToLoadDynamicColumns.WorkerReportsProgress = false;
+        }
+
+        private void InitializeBackgroundWorkerToLoadTeammemberColumn()
+        {
+            backgroundWorkerToLoadTeammemberColumn = new BackgroundWorker();
+            backgroundWorkerToLoadTeammemberColumn.DoWork += Backgroundworker_GetTeammemberNames;
+            backgroundWorkerToLoadTeammemberColumn.RunWorkerCompleted += Backgroundworker_LoadItemsSource;
+            backgroundWorkerToLoadTeammemberColumn.WorkerSupportsCancellation = false;
+            backgroundWorkerToLoadTeammemberColumn.WorkerReportsProgress = false;
         }
 
         /// <summary>
@@ -51,26 +83,41 @@ namespace TMMTMS
 
         private void LoadDataGrid()
         {
-            AddMembersToDataGrid();
-            AddDynamicColumnHeaders();
+            backgroundWorkerToLoadTeammemberColumn.RunWorkerAsync();
+            backgroundWorkerToLoadDynamicColumns.RunWorkerAsync();
         }
 
-        private void AddMembersToDataGrid()
+        private void Backgroundworker_GetMeetingNames(object sender, DoWorkEventArgs e)
         {
-            List<string> teammemberNames = Datenbank.GetTeammemberNames();
-            datagrid_attendance.ItemsSource = teammemberNames;
+            this.columnHeaderNames = Datenbank.GetMeetingNames();
         }
 
-        private void AddDynamicColumnHeaders()
+        private void Backgroundworker_LoadColumns(object sender, RunWorkerCompletedEventArgs e)
         {
-            List<string> columnHeaderNames = Datenbank.GetMeetingNames();
-            foreach (string columnName in columnHeaderNames)
+            if(e.Error == null) 
             {
-                DataGridTextColumn column = new DataGridTextColumn();
-                column.Header = columnName;
-                column.Binding = new Binding(columnName);
-                datagrid_attendance.Columns.Add(column);
+                foreach (string columnName in this.columnHeaderNames)
+                {
+                    DataGridTextColumn column = new DataGridTextColumn();
+                    column.Header = columnName;
+                    column.Binding = new Binding(columnName);
+                    datagrid_attendance.Columns.Add(column);
+                }
             }
+            else
+            {
+                MessageBoxHelper.ShowFailurePopUp("Spalten konnten nicht geladen werden.");
+            }
+        }
+
+        private void Backgroundworker_GetTeammemberNames(object sender, DoWorkEventArgs e)
+        {
+            this.teammemberNames = Datenbank.GetTeammemberNames();
+        }
+
+        private void Backgroundworker_LoadItemsSource(object sender, RunWorkerCompletedEventArgs e)
+        {
+            datagrid_attendance.ItemsSource = this.teammemberNames;
         }
     }
 }
